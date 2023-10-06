@@ -21,7 +21,7 @@ class FaceMeshDetector:
     BOX_COLOR = (0, 0, 255)
     THICKNESS = 2
 
-    def __init__(self, staticMode=False, maxFaces=2, refine_landmarks=True, minDetectionCon=0.5, minTrackCon=0.5):
+    def __init__(self, staticMode=False, maxFaces=10, refine_landmarks=True, minDetectionCon=0.4, minTrackCon=0.5):
         """
         Constructor method to initialize the FaceMeshDetector object.
 
