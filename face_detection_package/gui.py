@@ -8,6 +8,10 @@ Description:
     It provides a graphical user interface with buttons to interact with
     the systems internal webcam, video files, image files, in addition to
     CCTV (ip) camera and external webcam feeds for face detection.
+
+REVISIONS
+1. 11/2/23 - added effects argument to set the face detection effect applied to the drawn rectangles when gui
+             is initialized.
 """
 
 import datetime
@@ -30,18 +34,19 @@ class GUI:
     BUTTON_ACTIVE_FG = "#FFFFFF"
     BUTTON_WIDTH = 20
 
-    def __init__(self, version):
+    def __init__(self, version, effects):
         """
         Initialize the GUI and directories.
         """
+        self.effects = effects
         self.directory_manager = DirectoryManager()
         self.directory_manager.create_directories()
         # self.face_detector = FrontalFaceDetector()
         self.version = version
         if self.version == 1:
-            self.face_detector = FrontalFaceDetector()
+            self.face_detector = FrontalFaceDetector(self.effects)
         elif self.version == 2:
-            self.face_detector = FaceMeshDetector()
+            self.face_detector = FaceMeshDetector(self.effects)
 
         self.root = Tk()
         self.root.title("Face Detection Software")
