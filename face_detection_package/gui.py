@@ -8,16 +8,12 @@ Description:
     It provides a graphical user interface with buttons to interact with
     the systems internal webcam, video files, image files, in addition to
     CCTV (ip) camera and external webcam feeds for face detection.
-
-REVISIONS
-1. 11/2/23 - added effects argument to set the face detection effect applied to the drawn rectangles when gui
-             is initialized.
 """
 
 import datetime
 import subprocess
 import cv2
-from tkinter import Tk, Button, Label, filedialog
+from tkinter import Tk, Button, Label, filedialog, Radiobutton, IntVar, StringVar, OptionMenu
 import os
 from face_detection_package.directory_manager import DirectoryManager
 from face_detection_package.frontal_face_detector import FrontalFaceDetector
@@ -34,25 +30,34 @@ class GUI:
     BUTTON_ACTIVE_FG = "#FFFFFF"
     BUTTON_WIDTH = 20
 
-    def __init__(self, version, effects):
+    def __init__(self):
         """
         Initialize the GUI and directories.
         """
-        self.effects = effects
         self.directory_manager = DirectoryManager()
         self.directory_manager.create_directories()
-        # self.face_detector = FrontalFaceDetector()
-        self.version = version
-        if self.version == 1:
-            self.face_detector = FrontalFaceDetector(self.effects)
-        elif self.version == 2:
-            self.face_detector = FaceMeshDetector(self.effects)
+
+        self.detector_options = ['Basic: Frontal Face Detector', 'Advanced: Mesh Face Detector']
+        self.effect_options = ['None', 'Blur']
 
         self.root = Tk()
         self.root.title("Face Detection Software")
         self.root.configure(padx=25, pady=25)
 
+        self.detector_selected = StringVar()
+        self.effect_selected = StringVar()
+
+        self.detector_menu = OptionMenu(self.root, self.detector_selected, *self.detector_options)
+        self.effect_menu = OptionMenu(self.root, self.effect_selected, *self.effect_options)
+
+        self.effect = None
+        self.face_detector = FrontalFaceDetector(self.effect)
+
         self.title_lbl = Label(self.root, text="Face Detection Software", font=self.BUTTON_TEXT_FONT, pady=10)
+
+        self.detector_lbl = Label(self.root, text="Detector Version: ", font=self.BUTTON_TEXT_FONT)
+
+        self.effect_lbl = Label(self.root, text="Effect: ", font=self.BUTTON_TEXT_FONT)
 
         self.internal_webcam_btn = Button(self.root, text="Internal Webcam Feed", font=self.BUTTON_TEXT_FONT,
                                           bg="white",
@@ -99,6 +104,41 @@ class GUI:
                                command=self.show_help)
 
         self.status_lbl = Label(self.root, text="", font=("Courier", 10, "bold"))
+
+        self.save_options_btn = Button(self.root, text='Save Settings', command=self.set_detector_option)
+
+    def set_effect_option(self):
+        if self.effect_selected.get() == self.effect_options[0]:
+            print("None selected")
+            self.effect = 'None'
+            print(self.effect)
+        elif self.effect_selected.get() == self.effect_options[1]:
+            print("Blur selected")
+            self.effect = 'Blur'
+            print(self.effect)
+
+    def set_detector_option(self):
+        """
+        Set the selected detector option.
+
+        Returns:
+            None
+        """
+        print("options set")
+        try:
+            self.set_effect_option()
+            if self.detector_selected.get() == self.detector_options[0]:
+                print("detector version 1 selected")
+                self.face_detector = FrontalFaceDetector(self.effect)
+                print(self.face_detector)
+            elif self.detector_selected.get() == self.detector_options[1]:
+                print("detector version 2 selected")
+                self.face_detector = FaceMeshDetector(self.effect)
+                print(self.face_detector)
+        except Exception as e:
+            print(f"Error setting detector option: {e}")
+        finally:
+            print(f"Reset Settings To:\n Detector: {self.face_detector}\n Effect: {self.effect}")
 
     @staticmethod
     def show_help() -> None:
@@ -210,6 +250,15 @@ class GUI:
         try:
             # padx to ensure window is wide enough to see title on top bar...
             self.title_lbl.pack(pady=10, padx=30)
+
+            self.detector_lbl.pack(side='left', after=self.title_lbl, anchor='n', pady=10)
+            self.detector_selected.set(self.detector_options[0])
+            self.detector_menu.pack(after=self.detector_lbl, anchor='n')
+
+            self.effect_lbl.pack(side='left', after=self.detector_menu, anchor='n')
+            self.effect_selected.set(self.effect_options[0])
+            self.effect_menu.pack(after=self.effect_lbl, anchor='n')
+            self.save_options_btn.pack(pady=5)
             self.internal_webcam_btn.pack(pady=5)
             self.external_webcam_btn.pack(pady=5)
             self.cctv_btn.pack(pady=5)
@@ -236,16 +285,19 @@ class GUI:
         Returns:
             None
         """
+        print(f"In detect over webcam,\n detector = {self.face_detector} \n effect = {self.effect}")
         try:
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             cap = cv2.VideoCapture(channel)
 
             if not cap.isOpened():
                 # Update the status label after processing
-                self.status_lbl.config(text=f"Error opening camera.\n Please check if an external\n camera is connected.")
+                self.status_lbl.config(
+                    text=f"Error opening camera.\n Please check if an external\n camera is connected.")
                 # Schedule clearing the label after 5 seconds
                 self.root.after(5000, self.clear_status_label)
-                raise ValueError(f"Error opening camera channel {channel}. Please check if an external camera is connected.")
+                raise ValueError(
+                    f"Error opening camera channel {channel}. Please check if an external camera is connected.")
 
             # Create a VideoWriter object
             out = cv2.VideoWriter(
@@ -254,7 +306,9 @@ class GUI:
 
             while True:
                 ret, frame = cap.read()
+                print("in detect webcam, read capture and calling face detector.detect_faces method on frame")
                 self.face_detector.detect_faces(frame)
+                print("method called, writing to file and showing...")
                 out.write(frame)
                 cv2.imshow("Webcam - Press 'q' key to quit.", frame)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -401,3 +455,4 @@ class GUI:
             exit()
         except Exception as e:
             print(f"Error performing cleanup: {e}")
+

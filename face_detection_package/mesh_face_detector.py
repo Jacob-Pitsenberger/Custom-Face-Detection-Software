@@ -6,11 +6,6 @@ Date: 10-2-23
 Description:
     This module provides a FaceMeshDetector class that handles face detection using the OpenCV and
     Google MediaPipe libraries.
-
-REVISIONS
-1. 11/2/23 - added constant for text scale, added effects argument, and created a separate method for drawing
-             rectangles with the set effects and adjusted detection method to use this for drawing on the frame.
-             The effect added in this iteration allows for a blur effect to be drawn over detected faces.
 """
 import cv2
 import mediapipe as mp
@@ -27,7 +22,8 @@ class FaceMeshDetector:
     THICKNESS = 1
     SCALE = 1
 
-    def __init__(self, effects, staticMode=False, maxFaces=10, refine_landmarks=True, minDetectionCon=0.4, minTrackCon=0.5):
+    def __init__(self, effect, staticMode=False, maxFaces=10, refine_landmarks=True, minDetectionCon=0.4,
+                 minTrackCon=0.5):
         """
         Constructor method to initialize the FaceMeshDetector object.
 
@@ -54,7 +50,7 @@ class FaceMeshDetector:
 
         self.drawSpec = self.mpDraw.DrawingSpec(thickness=1, circle_radius=2)
 
-        self.effects = effects
+        self.effect = effect
 
     def detect_faces(self, frame: np.ndarray) -> None:
         """
@@ -72,10 +68,11 @@ class FaceMeshDetector:
 
             if self.results.multi_face_landmarks:
                 for faceLms in self.results.multi_face_landmarks:
+                    print("in mesh detector, calling draw rect method")
                     self.draw_rectangle(frame, faceLms)
                 # Update the face count with the number of faces detected
                 face_count = f'Faces: {len(self.results.multi_face_landmarks)}'
-                effect_text = f'Effects: {self.effects}'
+                effect_text = f'effect: {self.effect}'
                 cv2.putText(frame, face_count, (10, 25), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
                 cv2.putText(frame, effect_text, (10, 50), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
                 print(face_count)
@@ -94,6 +91,7 @@ class FaceMeshDetector:
             None
         """
         try:
+            print("in mesh detector, trying to get bounding box")
             # Get bounding box coordinates
             ih, iw, ic = frame.shape
             x_min, x_max, y_min, y_max = iw, 0, ih, 0
@@ -108,14 +106,21 @@ class FaceMeshDetector:
                     y_min = y
                 if y > y_max:
                     y_max = y
-            if self.effects is None:
+            """
+            print(f"bbox calculated, checking effect and drawing result...\n self.effect is {self.effect}")
+            print("if this is none then I dont know why this if statement is failing....ah")
+            if self.effect is None:
                 # Draw the bounding box
                 cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), self.BOX_COLOR, self.THICKNESS)
-            elif self.effects == 'blur':
+                print("in draw rectangle, found self.effect is None so should draw default box...")
+            """
+            if self.effect == 'Blur':
                 # Instead of drawing a rectangle we will first calculate the end coordinates using its boxes start coordinates
                 # Then we create a blured image for this area of the original frame
                 blur_img = cv2.blur(frame[y_min:y_max, x_min:x_max], (50, 50))
                 # And lastly we set detected area of the frame equal to the blurred image that we got from the area
                 frame[y_min:y_max, x_min:x_max] = blur_img
+            else:
+                cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), self.BOX_COLOR, self.THICKNESS)
         except Exception as e:
             print(f"Error in draw rectangle: {e}")

@@ -5,11 +5,6 @@ Date: 9-27-23
 
 Description:
     This module provides a FrontalFaceDetector class that handles face detection using the OpenCV library.
-
-REVISIONS
-1. 11/2/23 - added constant for text scale, added effects argument, and created a separate method for drawing
-             rectangles with the set effects and adjusted detection method to use this for drawing on the frame.
-             The effect added in this iteration allows for a blur effect to be drawn over detected faces.
 """
 
 import cv2
@@ -27,7 +22,7 @@ class FrontalFaceDetector:
     THICKNESS = 1
     SCALE = 1
 
-    def __init__(self, effects):
+    def __init__(self, effect):
         """
         Initialize the FrontalFaceDetector with a pre-trained cascade classifier for face detection.
         """
@@ -40,7 +35,7 @@ class FrontalFaceDetector:
         # Create a cascade
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
-        self.effects = effects
+        self.effect = effect
 
     def detect_faces(self, frame: np.ndarray) -> None:
         """
@@ -66,7 +61,7 @@ class FrontalFaceDetector:
 
             # Update the face count with the number of faces detected
             face_count = f'Faces: {len(faces)}'
-            effect_text = f'Effects: {self.effects}'
+            effect_text = f'effect: {self.effect}'
             cv2.putText(frame, face_count, (10, 25), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
             cv2.putText(frame, effect_text, (10, 50), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
             print(face_count)
@@ -74,12 +69,13 @@ class FrontalFaceDetector:
             print(f"Error in detect faces: {e}")
 
     def draw_rectangle(self, frame, dims):
+        print(f"In draw_rectangle, self.effect = {self.effect}")
         try:
             x, y, w, h = dims
-            if self.effects is None:
+            if self.effect is None:
                 # Draw a rectangle around the face using these values
                 cv2.rectangle(frame, (x, y), (x + w, y + h), self.BOX_COLOR, self.THICKNESS)
-            elif self.effects == 'blur':
+            elif self.effect == 'Blur':
                 # Instead of drawing a rectangle we will first calculate the end coordinates using its boxes start coordinates
                 x2 = x + w
                 y2 = y + h

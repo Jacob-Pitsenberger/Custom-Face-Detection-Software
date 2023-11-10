@@ -17,25 +17,33 @@ Usage:
     To run this module, specify the detector version (1 or 2) to use and execute the module using a Python interpreter.
 
 REVISIONS
-1. 11/2/23 - added a variable for the only effect currently functional (face blur). This is used when initializing
+1. 11/2/23
+- added a variable for the only effect currently functional (face blur). This is used when initializing
              the GUI instance and can be set to 'None' for standard detection rectangles.
 
-    FUTURE ENHANCEMENT
-    * Add a styling button to open a window that allows a user to set the effect parameter of the GUI class
-    by specifying the effect to apply with a radio or check button.
-    If this is not used, the default effect is set to None.
+2. 11/10/23
+	Initiated the GUI class with the frontal face detector as the default and introduced an option menu for users to switch between detector versions.
+	Implemented widgets allowing users to specify the detector and effects, with a button to save these settings.
+	Added functionality to update the GUI class's detector and effects parameters upon pressing the save settings button.
+	Ensured proper cleanup of resources from default or previous option window settings. (No changes needed)
+*Note: a bug caused for the if statement in mesh detectors draw box method checking for effect is None to fail.
+    - to overcome this, edited so the only if statement checks if the self.effect is set to blur and if not just draws box.
+
+NEXT STEP - I still need to test and ensure these changes work for postprocessing detections and once confirmed
+            work on styling and formatting the GUI to be more appealing and so that it is easy to add more widgets
+            seamlessly if needed.
 """
 
 from face_detection_package.gui import GUI
 
 
 if __name__ == "__main__":
-    effect = 'blur'
     try:
         # Initialize the GUI
-        gui = GUI(version=1, effects=effect)
+        gui = GUI()
         # Call the run_app method to run tkinter mainloop
         gui.run_app()
     except Exception as e:
         print(f"Error in main: {e}")
+
 
