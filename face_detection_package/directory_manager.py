@@ -18,9 +18,8 @@ class DirectoryManager:
         """
         Initialize directory paths.
         """
-        # Path to the root directory.
-        self.root_dir = os.path.join('..', 'Face Detection Software')
-        # self.root_dir = os.path.join('..')
+        # Path to the root directory (current working directory).
+        self.root_dir = os.getcwd()
 
         # Path to the different detections Directories.
         self.recordings_dir = os.path.join(self.root_dir, 'recorded_detections')
