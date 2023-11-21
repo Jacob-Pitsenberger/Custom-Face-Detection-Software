@@ -25,7 +25,7 @@ class FaceMeshDetector:
     TEXT_THICKNESS = 1//2
     SCALE = 0.5
 
-    def __init__(self, effect, show_info, staticMode=False, maxFaces=10, refine_landmarks=True, minDetectionCon=0.4,
+    def __init__(self, draw_box, show_info, draw_blur, staticMode=False, maxFaces=10, refine_landmarks=True, minDetectionCon=0.4,
                  minTrackCon=0.5):
         """
         Constructor method to initialize the FaceMeshDetector object.
@@ -53,7 +53,9 @@ class FaceMeshDetector:
 
         self.drawSpec = self.mpDraw.DrawingSpec(thickness=1, circle_radius=2)
 
-        self.effect = effect
+        # self.effect = effect
+        self.draw_box = draw_box
+        self.draw_blur = draw_blur
         self.show_info = show_info
         self.version_name = 'Advanced: Mesh Face Detector'
 
@@ -80,7 +82,7 @@ class FaceMeshDetector:
                     self.draw_rectangle(frame, faceLms)
                 # Update the face count with the number of faces detected
                 face_count = f'Faces: {len(self.results.multi_face_landmarks)}'
-                effect_text = f'effect: {self.effect}'
+                effect_text = f'blur: {self.draw_blur}'
                 self.draw_info(frame, face_count, effect_text, timestamp)
                 # cv2.putText(frame, face_count, (10, 25), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
                 # cv2.putText(frame, effect_text, (10, 50), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
@@ -123,13 +125,13 @@ class FaceMeshDetector:
                 cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), self.BOX_COLOR, self.THICKNESS)
                 print("in draw rectangle, found self.effect is None so should draw default box...")
             """
-            if self.effect == 'Blur':
+            if self.draw_blur:
                 # Instead of drawing a rectangle we will first calculate the end coordinates using its boxes start coordinates
                 # Then we create a blured image for this area of the original frame
                 blur_img = cv2.blur(frame[y_min:y_max, x_min:x_max], (50, 50))
                 # And lastly we set detected area of the frame equal to the blurred image that we got from the area
                 frame[y_min:y_max, x_min:x_max] = blur_img
-            else:
+            if self.draw_box:
                 cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), self.BOX_COLOR, self.BOX_THICKNESS)
         except Exception as e:
             print(f"Error in draw rectangle: {e}")

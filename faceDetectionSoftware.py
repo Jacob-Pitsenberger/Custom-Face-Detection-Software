@@ -1,11 +1,11 @@
 """
 Module: faceDetectionSoftware.py
 Author: Jacob Pitsenberger
-Last Updated: 11/18/23
+Last Updated: 11/21/23
 
 Description:
     This module serves as the entry point for the Face Detection Software application. It initializes the GUI
-    and starts the main event loop.
+    starting the main event loop.
 
 Usage:
     To run this module, execute the module using a Python interpreter.

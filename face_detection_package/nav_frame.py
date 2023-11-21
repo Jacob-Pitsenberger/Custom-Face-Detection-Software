@@ -1,7 +1,6 @@
 import os
 import subprocess
-from tkinter import filedialog
-
+from face_detection_package.utils import open_file_explorer
 import customtkinter as ctk
 
 RED = '#4a020d'
@@ -12,6 +11,7 @@ class Nav(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.place(x=0, y=0, relwidth=1, relheight=0.2)
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -100,27 +100,9 @@ class Nav(ctk.CTkFrame):
             None
         """
         try:
-            file_path = self.open_file_explorer()
+            file_path = open_file_explorer()
             if file_path:
                 self.open_with_default_player(file_path)
         except Exception as e:
             print(f"Error opening file with default player: {e}")
 
-    @staticmethod
-    def open_file_explorer() -> str:
-        """
-        Open a file explorer dialog to allow the user to select a file.
-
-        Returns:
-            str: The path of the selected file.
-        """
-        try:
-            # initial_dir = os.path.join(os.getcwd(), '../Face Detection Software')
-            initial_dir = os.path.join(os.getcwd())
-            file_path = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("All files", "*.*")])
-            # `file_path` will contain the path of the selected file.
-            print("Selected file:", file_path)
-            return file_path
-        except Exception as e:
-            print(f"Error opening file explorer: {e}")
-            return None
