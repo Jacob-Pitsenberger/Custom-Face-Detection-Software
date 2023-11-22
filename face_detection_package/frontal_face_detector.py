@@ -1,13 +1,33 @@
 """
 Module: frontal_face_detector.py
 Author: Jacob Pitsenberger
-Date: 9-27-23
+Date: 11/22/23
 
 Description:
     This module provides a FrontalFaceDetector class that handles face detection using the OpenCV library.
-"""
-from datetime import datetime
 
+Classes:
+- FrontalFaceDetector: Handles face detection using a pre-trained cascade classifier.
+
+Constants:
+- FONT: Font type for text overlay on the frame.
+- TEXT_COLOR: Text color for overlay.
+- BOX_COLOR: Color of the bounding box around detected faces.
+- BOX_THICKNESS: Thickness of the bounding box.
+- TEXT_THICKNESS: Thickness of the text overlay.
+- SCALE: Scaling factor for text and box dimensions.
+
+Methods:
+- __init__(self, draw_box, draw_blur): Initializes the FrontalFaceDetector.
+- detect_faces(self, frame: np.ndarray) -> None: Detects faces in a given frame.
+- draw_rectangle(self, frame, dims): Draws rectangles around detected faces.
+
+Attributes:
+- face_cascade: Cascade classifier for face detection.
+- version_name: Version name of the detector.
+- draw_box: Flag indicating whether to draw bounding boxes.
+- draw_blur: Flag indicating whether to blur detected faces.
+"""
 import cv2
 import os
 import numpy as np
@@ -21,12 +41,10 @@ class FrontalFaceDetector:
     TEXT_COLOR = (0, 255, 255)
     BOX_COLOR = (0, 0, 255)
     BOX_THICKNESS = 2
-    # TEXT_THICKNESS = 1//2
-    # SCALE = 0.5
     TEXT_THICKNESS = 1
     SCALE = 1
 
-    def __init__(self, draw_box, show_info, draw_blur):
+    def __init__(self, draw_box, draw_blur):
         """
         Initialize the FrontalFaceDetector with a pre-trained cascade classifier for face detection.
         """
@@ -42,9 +60,8 @@ class FrontalFaceDetector:
         self.version_name = "Basic: Frontal Face Detector"
         self.draw_box = draw_box
         self.draw_blur = draw_blur
-        self.show_info = show_info
 
-    def detect_faces(self, frame: np.ndarray, current_time) -> None:
+    def detect_faces(self, frame: np.ndarray) -> None:
         """
         Detect faces in a given frame using the pre-trained cascade classifier.
 
@@ -55,28 +72,16 @@ class FrontalFaceDetector:
             None
         """
         try:
-            # timestamp = datetime.now().strftime("%d %b %Y  %H:%M:%S.%f")
-            # timestamp = datetime.now()
-            timestamp = current_time
-
             # Convert the frame to grayscale
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            # Get numpy array with values for faces detected by passing in grayscale image, scale factor, and minimum neighbors
-            faces = self.face_cascade.detectMultiScale(frame_gray, 1.2, 8)
+            faces = self.face_cascade.detectMultiScale(image=frame_gray, scaleFactor=1.05, minNeighbors=5)
 
             # For the x, y coordinates and width, height detected
             for (x, y, w, h) in faces:
                 dims = [x, y, w, h]
                 self.draw_rectangle(frame, dims)
 
-            # Update the face count with the number of faces detected
-            face_count = f'Faces: {len(faces)}'
-            effect_text = f'blur: {self.draw_blur}'
-            self.draw_info(frame, face_count, effect_text, timestamp)
-            # cv2.putText(frame, face_count, (10, 25), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
-            # cv2.putText(frame, effect_text, (10, 50), self.FONT, self.SCALE, self.TEXT_COLOR, self.THICKNESS)
-            print(face_count)
         except Exception as e:
             print(f"Error in detect faces: {e}")
 
@@ -97,35 +102,5 @@ class FrontalFaceDetector:
         except Exception as e:
             print(f"Error in draw rectangle: {e}")
 
-    def draw_info(self, frame, face_count, effect_text, timestamp):
-        """These integer hardcoded values were determined when testing over the test image and successfully
-        formatted this info box based on this images dimensions. When testing over a video file, the dimensions
-        of the draw info box were to large and covered the majority of the video frames so this is not an
-        adequate approach.
-        For the first release, this feature will be disabled (no button in gui and just leave parameter set to False).
-        """
-        if self.show_info is True:
-            w, h, c = frame.shape
-            scale = w//480
-            step = (scale*scale) + 10
-            print(f'scale_factor: {scale}')
-            # Divide dimensions by 8 to get 720x480 res (with dims = 5740, 3840)
-            box_end = ((h//scale*2), 7*(w//scale)//4)
-            print(f'width {w}\n height {h}')
-            # print(f'box end coordinates are {box_end}')
-            date = timestamp.strftime("%d %b %Y")
-            time = timestamp.strftime("%H:%M:%S")
 
-            # Draw a rectangle to hold the drawn text in the upper left corner of the video stream window.
-            # the -1 argument indicates the rectangle is filled.
-            # cv2.rectangle(frame, (0, 0), (185, 80), (0, 0, 0), -1)
-            cv2.rectangle(frame, (0, 0), box_end, (0, 0, 0), -1)
-            cv2.putText(frame, self.version_name, (5, step), self.FONT, self.SCALE*scale//2, self.TEXT_COLOR, self.TEXT_THICKNESS*scale//2)
-            cv2.putText(frame, effect_text, (5, step*3), self.FONT, self.SCALE*scale//2, self.TEXT_COLOR, self.TEXT_THICKNESS*scale//2)
-            cv2.putText(frame, face_count, (5, step*5), self.FONT, self.SCALE*scale//2, self.TEXT_COLOR, self.TEXT_THICKNESS*scale//2)
-            cv2.putText(frame, '-------------------', (5, step*7), self.FONT, self.SCALE*scale//2, self.TEXT_COLOR, self.TEXT_THICKNESS*scale//2)
-            cv2.putText(frame, date, (5, step*9), self.FONT, self.SCALE*scale//2, self.TEXT_COLOR, self.TEXT_THICKNESS*scale//2)
-            cv2.putText(frame, time, (5, step*11), self.FONT, self.SCALE*scale//2, self.TEXT_COLOR, self.TEXT_THICKNESS*scale//2)
-        else:
-            pass
 

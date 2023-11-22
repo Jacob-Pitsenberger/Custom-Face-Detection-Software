@@ -1,11 +1,25 @@
-import os
-import subprocess
-from face_detection_package.utils import open_file_explorer
+"""
+Module: nav_frame.py
+Author: Jacob Pitsenberger
+Date: 11/22/23
+
+Description:
+    This module defines the Navigation class, which handles the navigation menu for the face detection application.
+    It includes options to navigate between different sections of the application, such as post-processing and settings.
+
+Classes:
+- Navigation: A class representing the navigation menu for the face detection application.
+
+Dependencies:
+- customtkinter as ctk: A customized version of the tkinter library for GUI development.
+
+Constants:
+- RED: Hexadecimal color code for red used in the GUI.
+- BLUE: Hexadecimal color code for blue used in the GUI.
+"""
+
 import customtkinter as ctk
-
-RED = '#4a020d'
-BLUE = '#06003d'
-
+from face_detection_package.utils import open_file_with_default_player, RED, BLUE
 
 class Nav(ctk.CTkFrame):
     def __init__(self, parent):
@@ -22,7 +36,7 @@ class Nav(ctk.CTkFrame):
                              text_color='white')
         files_btn = ctk.CTkButton(title_frame, text='Files', width=75, fg_color=BLUE, font=('Roboto', 12),
                                   text_color='white',
-                                  command=self.open_file_with_default_player)
+                                  command=open_file_with_default_player)
         help_btn = ctk.CTkButton(title_frame, text='Help', width=75, fg_color=BLUE, font=('Roboto', 12),
                                  text_color='white',
                                  command=lambda: self.show_help())
@@ -31,7 +45,7 @@ class Nav(ctk.CTkFrame):
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
 
-        # toggle layout
+        # Add the widgets
         title_frame.grid(row=0, column=0, columnspan=3, sticky='nsew', pady=(5, 5), padx=(5, 5))
         label.pack(expand=True, side='left', fill='both', padx=(10, 40), pady=10)
         files_btn.pack(side='right', padx=5)
@@ -44,65 +58,39 @@ class Nav(ctk.CTkFrame):
         """
         try:
             help_text = """
-            Welcome to the Face Detection Software!
-
-            Instructions:
-            1. Internal Webcam Feed: Click this button to open the webcam feed and detect faces in real-time.
-            2. External Webcam Feed: Click this button to use an external webcam and detect faces in real-time.
-            3. CCTV Feed: Click this button to open a CCTV feed and detect faces in real-time.
-            4. Detect Over Video: Click this button to select a video file and detect faces in it.
-            5. Detect Over Image: Click this button to select an image file and detect faces in it.
-            6. Files: Click this button to open the file explorer to select a file to view.
-            7. Help: Click this button to view instructions on how to use the program.
-
-            Notes:
-            - Make sure to use video/image files with valid extensions (.mp4, .mov, .jpg, .png) when making detections.
-            - All real-time feeds viewed by a user are saved to a video file in the recorded_detections directory.
-            - Image and Video detections are saved to the image_/video_detections directories respectively.
-            - A message will notify you when detections are done being made over a video or image file.
-
-            Enjoy using the Face Detection Software!
-            """
+                Welcome to the Face Detection Software!
+                
+                Instructions:
+                1. Specify the detector version by selecting it from the drop-down menu in the settings frame.
+                2. Check the boxes in the settings frame for the effects you want applied to detections.
+                3. In the post-processing frame, press the 'Video' button to open the file explorer and select a video file for detections.
+                4. In the post-processing frame, press the 'Image' button to open the file explorer and select an image file for detections.
+                5. After selecting either post-processing button, text will appear on the interface indicating that the selected file is 
+                   being processed for detections. When detections are done processing, this message will update indicating success.
+                
+                Buttons:
+                - Files Button: Click this button to open the file explorer and select a file to view.
+                - Help Button: Click this button to view instructions on how to use the program.
+                
+                Notes:
+                - Ensure you use video/image files with valid extensions (.mp4, .mov, .jpg, .png) when making detections.
+                - Image and video detections are saved to the 'image_detections' and 'video_detections' directories, respectively.
+                - A message will notify you when detections are being processed and when they are done processing.
+                  (Note: The GUI will appear unresponsive until the success message appears.)
+                - The detector is initialized when either the 'Video' or Image' detection button is pressed and is 
+                  done so with the current values specified in the settings frame.
+                
+                Enjoy using the Face Detection Software!
+                """
             help_window = ctk.CTk()
             help_window.title("Help")
 
-            help_label = ctk.CTkLabel(help_window, text=help_text, font=("Courier", 10), justify='left')
+            help_label = ctk.CTkLabel(help_window, text=help_text, font=('Roboto', 12), justify='left')
             help_label.pack(padx=10)
 
             help_window.mainloop()
         finally:
             help_window.quit()
 
-    @staticmethod
-    def open_with_default_player(file_path: str) -> None:
-        """
-        Open a file using the default system application.
 
-        Args:
-            file_path (str): The path to the file to be opened.
-
-        Returns:
-            None
-        """
-        try:
-            if os.name == 'nt':
-                os.startfile(file_path)  # Opens the file using the default Windows application
-            elif os.name == 'posix':
-                subprocess.run(['xdg-open', file_path])  # Opens the file using xdg-open (Linux)
-        except Exception as e:
-            print(f"Error opening file: {e}")
-
-    def open_file_with_default_player(self) -> None:
-        """
-        Open a file selected by the user using the default system application.
-
-        Returns:
-            None
-        """
-        try:
-            file_path = open_file_explorer()
-            if file_path:
-                self.open_with_default_player(file_path)
-        except Exception as e:
-            print(f"Error opening file with default player: {e}")
 

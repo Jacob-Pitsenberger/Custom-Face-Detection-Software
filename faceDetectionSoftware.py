@@ -1,10 +1,10 @@
 """
 Module: faceDetectionSoftware.py
 Author: Jacob Pitsenberger
-Last Updated: 11/21/23
+Last Updated: 11/22/23
 
 Description:
-    This module serves as the entry point for the Face Detection Software application. It initializes the GUI
+    This module serves as the entry point for the Face Detection Software application. It initializes the GUI,
     starting the main event loop.
 
 Usage:

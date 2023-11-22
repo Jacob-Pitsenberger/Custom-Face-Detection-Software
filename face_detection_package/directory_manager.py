@@ -1,13 +1,15 @@
 """
 Module: directory_manager.py
 Author: Jacob Pitsenberger
-Date: 11-21-23
+Date: 11-22-23
 
 Description:
-    This module manages directory paths for the Face Detection Software application.
-    It provides methods to initialize directory paths and create necessary directories.
-        * 11/21/23 - Commented out code to create recordings directory since this will only be utilized for the
-                     post-processing detections for the initial release.
+    This module provides a DirectoryManager class that manages directory paths for the Face Detection Software application.
+    It includes methods to initialize directory paths and create necessary directories.
+
+Notes:
+    - 11/21/23: Commented out code to create the recordings directory since this will only be utilized for the
+                post-processing detections for the initial release.
 """
 
 import os
@@ -29,7 +31,6 @@ class DirectoryManager:
         self.images_dir = os.path.join(self.root_dir, 'image_detections')
         # self.directories = [self.root_dir, self.recordings_dir, self.videos_dir, self.images_dir]
         self.directories = [self.root_dir, self.videos_dir, self.images_dir]
-
 
     def create_directories(self) -> None:
         """

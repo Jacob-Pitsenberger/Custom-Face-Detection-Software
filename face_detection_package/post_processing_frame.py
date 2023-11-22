@@ -1,15 +1,46 @@
+"""
+Module: post_processing_frame.py
+Author: Jacob Pitsenberger
+Date: 11/22/23
+
+Description:
+    This module defines the PostProcessDetections class, which is responsible for creating a graphical user
+    interface (GUI) to process video and image files, detect faces, and display the results. It uses face
+    detection algorithms and provides options for video and image processing.
+
+Classes:
+- PostProcessDetections: A class representing the GUI for processing video and image files and detecting faces.
+
+Dependencies:
+- os: Provides a way to interact with the operating system, such as file path manipulations.
+- face_detection_package.utils: Contains utility functions and constants used in face detection.
+- customtkinter as ctk: A customized version of the tkinter library for GUI development.
+- datetime: Offers functionalities for working with dates and times.
+- cv2: OpenCV library for computer vision tasks.
+
+Constants:
+- RED: Hexadecimal color code for red used in the GUI.
+- BLUE: Hexadecimal color code for blue used in the GUI.
+"""
+
 import os
-from face_detection_package.utils import open_file_explorer
+from face_detection_package.utils import open_file_explorer, RED, BLUE
 import customtkinter as ctk
 import datetime
 import cv2
 
-RED = '#4a020d'
-BLUE = '#06003d'
-
-
 class PostProcessDetections(ctk.CTkFrame):
-    def __init__(self, parent, detector, directory_manager):
+    def __init__(self, parent):
+        """
+        Initialize the PostProcessDetections instance.
+
+        Args:
+            parent: The parent widget.
+
+        Returns:
+            None
+        """
+
         super().__init__(parent)
         self.place(relx=0.6, rely=0.2, relwidth=0.4, relheight=0.8)
 
@@ -29,27 +60,34 @@ class PostProcessDetections(ctk.CTkFrame):
         self.rowconfigure(0, weight=1, uniform='a')
 
         self.parent = parent
-        self.face_detector = detector
-        self.directory_manager = directory_manager
+        self.face_detector = None
+        print(self.face_detector)
+        self.directory_manager = self.parent.directory_manager
 
         self.create_widgets()
 
-    def update_face_detector(self, new_detector):
+    def create_detector(self, staticMode_flag: bool = None) -> None:
         """
-        Updates the face detector used for face detection.
+        Create a face detector using the specified staticMode_flag.
 
         Args:
-            new_detector: The new face detector.
+            staticMode_flag (bool): A flag indicating whether to use static mode for the face detector (mesh model only).
 
         Returns:
             None
         """
-        try:
-            self.face_detector = new_detector
-        except Exception as e:
-            print(f"Error updating face detector: {e}")
+        print(f"in ... before set we have the detector = {self.face_detector}")
+        self.parent.settings.set_detector(staticMode_flag)
+        self.face_detector = self.parent.settings.face_detector
+        print(f"in create detector, set self.face_detector = {self.face_detector}")
 
-    def create_widgets(self):
+    def create_widgets(self) -> None:
+        """
+        Create widgets for the PostProcessDetections frame.
+
+        Returns:
+            None
+        """
         self.detections_frame.grid(row=0, column=0, columnspan=3, sticky='nsew', pady=(0, 5), padx=(5, 5))
         self.detections_label.pack(fill='both', pady=(0, 10), ipady=15)
         self.video_btn.pack(pady=(40, 20))
@@ -70,7 +108,18 @@ class PostProcessDetections(ctk.CTkFrame):
             print(f"Error clearing status label: {e}")
 
     def detect_over_video(self) -> None:
+        """
+        Process a video file, detect faces in each frame, and save the output.
+
+        Raises:
+            ValueError: If the selected video file has an invalid extension.
+            cv2.error: If an OpenCV-related error occurs during video processing.
+
+        Returns:
+            None
+        """
         try:
+            self.create_detector(staticMode_flag=False)
             current_time = datetime.datetime.now()
             timestamp = current_time.strftime("%Y%m%d_%H%M%S")
             video_path = open_file_explorer()
@@ -96,7 +145,7 @@ class PostProcessDetections(ctk.CTkFrame):
 
                 for frame_count in range(total_frames):
                     ret, frame = cap.read()
-                    self.face_detector.detect_faces(frame, current_time)
+                    self.face_detector.detect_faces(frame)
                     out.write(frame)
 
                 self.clear_status_label()
@@ -108,12 +157,25 @@ class PostProcessDetections(ctk.CTkFrame):
                 # Update status label when processing is done
                 self.status_lbl.configure(text="Video detections processed")
                 self.after(5000, self.clear_status_label)
-
+        except ValueError as ve:
+            print(f"ValueError: {ve}")
+        except cv2.error as cve:
+            print(f"OpenCV Error: {cve}")
         except Exception as e:
             print(f"Error detecting faces over video: {e}")
 
     def detect_over_image(self) -> None:
+        """
+        Process an image file, detect faces, and save the output.
+
+        Raises:
+            ValueError: If the selected image file has an invalid extension.
+
+        Returns:
+            None
+        """
         try:
+            self.create_detector(staticMode_flag=True)
             current_time = datetime.datetime.now()
             timestamp = current_time.strftime("%Y%m%d_%H%M%S")
             img_path = open_file_explorer()
@@ -131,89 +193,14 @@ class PostProcessDetections(ctk.CTkFrame):
                 self.status_lbl.configure(text="Processing image...")
                 self.update()
 
-                self.face_detector.detect_faces(img, current_time)
+                self.face_detector.detect_faces(img)
                 cv2.imwrite(img_path_out, img)
                 cv2.destroyAllWindows()
 
                 # Update status label when processing is done
                 self.status_lbl.configure(text="Image detections processed")
                 self.after(5000, self.clear_status_label)
-
+        except ValueError as ve:
+            print(f"ValueError: {ve}")
         except Exception as e:
             print(f"Error detecting faces over image: {e}")
-    """
-    def detect_over_video(self) -> None:
-        try:
-            current_time = datetime.datetime.now()
-            timestamp = current_time.strftime("%Y%m%d_%H%M%S")
-            video_path = open_file_explorer()
-            if video_path:
-                # Check if the selected file has a valid extension
-                valid_extensions = ('.mp4', '.mov')
-                if not video_path.lower().endswith(valid_extensions):
-                    raise ValueError("Invalid file type. Please select a .mp4 or .mov file.")
-
-                # Specify the path to save the video with found detections in the 'video_detections' directory.
-                video_path_out = os.path.join(self.directory_manager.videos_dir,
-                                              f'{os.path.basename(video_path)}_{timestamp}_detections.mp4')
-
-                # Create a video capture object for the video to predict upon.
-                cap = cv2.VideoCapture(video_path)
-                # Start reading the video.
-                ret, frame = cap.read()
-                # Get the dimensions of the video frames.
-                H, W, _ = frame.shape
-                # Initialize our video writer for saving the output video.
-                out = cv2.VideoWriter(video_path_out, cv2.VideoWriter_fourcc(*'mp4v'), int(cap.get(cv2.CAP_PROP_FPS)),
-                                      (W, H))
-
-                # Loop through frames read from the video file.
-                while ret:
-                    self.face_detector.detect_faces(frame, current_time)
-                    # Write the frame to the output file.
-                    out.write(frame)
-                    # Keep reading the frames from the video file until they have all been processed.
-                    ret, frame = cap.read()
-                self.clear_status_label()
-
-                # Release resources when the video is done being processed.
-                cap.release()
-                out.release()
-                cv2.destroyAllWindows()
-
-                # Update the status label after processing
-                self.status_lbl.configure(text="Video detections processed")
-                # Schedule clearing the label after 5 seconds
-                self.after(5000, self.clear_status_label)
-        except Exception as e:
-            print(f"Error detecting faces over video: {e}")
-
-    def detect_over_image(self) -> None:
-        try:
-            current_time = datetime.datetime.now()
-            timestamp = current_time.strftime("%Y%m%d_%H%M%S")
-            img_path = open_file_explorer()
-            if img_path:
-                # Check if the selected file has a valid extension
-                valid_extensions = ('.png', '.jpg')
-                if not img_path.lower().endswith(valid_extensions):
-                    raise ValueError("Invalid file type. Please select a .png or .jpg file.")
-
-                # Specify the path to save the image with found detections.
-                img_path_out = os.path.join(self.directory_manager.images_dir,
-                                            f'{os.path.basename(img_path)}_{timestamp}_detections.jpg')
-
-                # Read the image.
-                img = cv2.imread(img_path)
-
-                self.face_detector.detect_faces(img, current_time)
-                cv2.imwrite(img_path_out, img)
-                cv2.destroyAllWindows()
-
-                # Update the status label after processing
-                self.status_lbl.configure(text="Image detections processed")
-                # Schedule clearing the label after 5 seconds
-                self.after(5000, self.clear_status_label)
-        except Exception as e:
-            print(f"Error detecting faces over image: {e}")
-    """
