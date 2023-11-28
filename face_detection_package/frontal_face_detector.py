@@ -44,7 +44,9 @@ class FrontalFaceDetector:
     TEXT_THICKNESS = 1
     SCALE = 1
 
-    def __init__(self, draw_box, draw_blur):
+    # def __init__(self, draw_box, draw_blur):
+    def __init__(self, settings):
+
         """
         Initialize the FrontalFaceDetector with a pre-trained cascade classifier for face detection.
         """
@@ -58,8 +60,10 @@ class FrontalFaceDetector:
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
         self.version_name = "Basic: Frontal Face Detector"
-        self.draw_box = draw_box
-        self.draw_blur = draw_blur
+        self.settings = settings
+
+        # self.draw_box = draw_box
+        # self.draw_blur = draw_blur
 
     def detect_faces(self, frame: np.ndarray) -> None:
         """
@@ -89,7 +93,8 @@ class FrontalFaceDetector:
     def draw_rectangle(self, frame, dims):
         try:
             x, y, w, h = dims
-            if self.draw_blur is True:
+            # if self.draw_blur is True:
+            if self.settings.draw_blur:
                 # Instead of drawing a rectangle we will first calculate the end coordinates using its boxes start coordinates
                 x2 = x + w
                 y2 = y + h
@@ -97,7 +102,8 @@ class FrontalFaceDetector:
                 blur_img = cv2.blur(frame[y:y2, x:x2], (50, 50))
                 # And lastly we set detected area of the frame equal to the blurred image that we got from the area
                 frame[y:y2, x:x2] = blur_img
-            if self.draw_box is True:
+            # if self.draw_box is True:
+            if self.settings.draw_box:
                 # Draw a rectangle around the face using these values
                 cv2.rectangle(frame, (x, y), (x + w, y + h), self.BOX_COLOR, self.BOX_THICKNESS)
         except Exception as e:

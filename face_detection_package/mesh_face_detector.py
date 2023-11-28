@@ -60,7 +60,8 @@ class FaceMeshDetector:
     TEXT_THICKNESS = 1
     SCALE = 1
 
-    def __init__(self, draw_box, draw_blur, staticMode, maxFaces=10, refine_landmarks=False, minDetectionCon=0.2,
+    # def __init__(self, draw_box, draw_blur, staticMode, maxFaces=10, refine_landmarks=False, minDetectionCon=0.2,
+    def __init__(self, settings, staticMode, maxFaces=10, refine_landmarks=False, minDetectionCon=0.2,
                  minTrackCon=0.2):
         """
         Constructor method to initialize the FaceMeshDetector object.
@@ -92,8 +93,9 @@ class FaceMeshDetector:
 
         self.drawSpec = self.mpDraw.DrawingSpec(thickness=1, circle_radius=2)
 
-        self.draw_box = draw_box
-        self.draw_blur = draw_blur
+        self.settings = settings
+        # self.draw_box = draw_box
+        # self.draw_blur = draw_blur
         self.version_name = 'Advanced: Mesh Face Detector'
 
     def detect_faces(self, frame: np.ndarray) -> None:
@@ -142,10 +144,10 @@ class FaceMeshDetector:
                     y_min = y
                 if y > y_max:
                     y_max = y
-            if self.draw_blur:
+            if self.settings.draw_blur:
                 blur_img = cv2.blur(frame[y_min:y_max, x_min:x_max], (50, 50))
                 frame[y_min:y_max, x_min:x_max] = blur_img
-            if self.draw_box:
+            if self.settings.draw_box:
                 cv2.rectangle(frame, (x_min, y_min), (x_max, y_max), self.BOX_COLOR, self.BOX_THICKNESS)
         except Exception as e:
             print(f"Error in draw rectangle: {e}")

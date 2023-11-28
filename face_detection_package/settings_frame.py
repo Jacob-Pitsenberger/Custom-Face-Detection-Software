@@ -1,32 +1,9 @@
-"""
-Module: settings_frame.py
-Author: Jacob Pitsenberger
-Date: 11/28/23
-
-Description:
-    This module defines the Settings class, responsible for creating a graphical user interface (GUI) to adjust
-    settings related to face detection. Users can choose the face detection algorithm, toggle visualization
-    effects, and configure additional options.
-
-Classes:
-- Settings: A class representing the GUI for adjusting face detection settings.
-
-Dependencies:
-- customtkinter as ctk: A customized version of the tkinter library for GUI development.
-- face_detection_package.frontal_face_detector: Module containing the FrontalFaceDetector class.
-- face_detection_package.mesh_face_detector: Module containing the FaceMeshDetector class.
-- face_detection_package.utils: Contains utility functions and constants used in face detection.
-
-Constants:
-- RED: Hexadecimal color code for red used in the GUI.
-- BLUE: Hexadecimal color code for blue used in the GUI.
-"""
-
+# Add these import statements at the beginning of the module
 import customtkinter as ctk
 from face_detection_package.frontal_face_detector import FrontalFaceDetector
 from face_detection_package.mesh_face_detector import FaceMeshDetector
 
-
+# Inside the Settings class
 class Settings(ctk.CTkFrame):
     def __init__(self, parent):
         """
@@ -76,9 +53,32 @@ class Settings(ctk.CTkFrame):
 
         # Set the default effect and face detector settings.
         self.draw_box = True
-        self.draw_feed_info = False
         self.draw_blur = False
-        self.face_detector = None
+
+        # Initialize face detectors
+        # self.haar_detector = FrontalFaceDetector(self.draw_box, self.draw_blur)
+        self.haar_detector = FrontalFaceDetector(self)
+        # self.mesh_detector_img = FaceMeshDetector(self.draw_box, self.draw_blur, True)
+        # self.mesh_detector_vid = FaceMeshDetector(self.draw_box, self.draw_blur, False)
+        self.mesh_detector_img = FaceMeshDetector(self, True)
+        self.mesh_detector_vid = FaceMeshDetector(self, False)
+
+        # Set the default face detector
+        self.face_detector = self.haar_detector  # Set the default detector
+
+        # Create IntVar to track the state of checkboxes
+        self.bbox_var = ctk.IntVar(value=1)
+        self.blur_var = ctk.IntVar(value=0)
+
+        # Connect the detector menu variable to a callback
+        self.detector_menu_var.trace_add('write', self.update_detector)
+
+        # Connect checkbox variables to their respective callbacks
+        self.bbox_cb.configure(variable=self.bbox_var, command=self.update_checkbox)
+        self.blur_cb.configure(variable=self.blur_var, command=self.update_checkbox)
+
+        self.static_mode_flag = False  # Default value, change as needed
+
         self.create_widgets()
 
     def create_widgets(self) -> None:
@@ -97,73 +97,43 @@ class Settings(ctk.CTkFrame):
         self.bbox_cb.pack(pady=10, padx=(20, 0), anchor='w')
         self.blur_cb.pack(pady=10, padx=(20, 0), anchor='w')
 
-    def set_draw_box(self) -> None:
+    def update_detector(self, *args):
         """
-        Set the draw box attribute based on the checkbox state.
-
-        Returns:
-            None
-        """
-        state: int = self.bbox_cb.get()
-        self.draw_box = state == 1
-        print(f'draw box set to {self.draw_box}')
-        """
-        if self.bbox_cb.get() == 1:
-            print('draw box set to True')
-            self.draw_box = True
-        elif self.bbox_cb.get() == 0:
-            print('draw box set to False')
-            self.draw_box = False
-        """
-
-    def set_draw_blur(self) -> None:
-        """
-        Set the draw blur attribute based on the checkbox state.
-
-        Returns:
-            None
-        """
-        state: int = self.blur_cb.get()
-        self.draw_blur = state == 1
-        print(f'draw blur set to {self.draw_blur}')
-        """
-        if self.blur_cb.get() == 1:
-            print('draw blur set to True')
-            self.draw_blur = True
-        elif self.blur_cb.get() == 0:
-            print('draw blur set to False')
-            self.draw_blur = False
-        """
-
-    def set_detector(self, staticMode_flag: bool) -> None:
-        """
-        Set the face detector based on the selected option and settings.
-
-        Args:
-            staticMode_flag (bool): A flag indicating whether to use static mode for the face detector (mesh model only).
+        Update the face detector based on the selected option.
 
         Returns:
             None
         """
         try:
-            self.set_draw_box()
-            self.set_draw_blur()
+            self.update_checkbox()  # Update checkboxes first
             if self.detector_menu_var.get() == self.detector_options[0]:
                 print("detector version 1 selected")
-                self.face_detector = FrontalFaceDetector(self.draw_box, self.draw_blur)
+                self.face_detector = self.haar_detector  # Use the Haar detector
                 print(self.face_detector)
             elif self.detector_menu_var.get() == self.detector_options[1]:
                 print("detector version 2 selected")
-                if staticMode_flag:
-                    self.face_detector = FaceMeshDetector(self.draw_box, self.draw_blur, True)
+                if self.static_mode_flag:
+                    self.face_detector = self.mesh_detector_img
                     print(self.face_detector)
                     print(f'Initialized with staticMode set to True for image detections')
-                elif staticMode_flag is False:
-                    self.face_detector = FaceMeshDetector(self.draw_box, self.draw_blur, False)
+                elif not self.static_mode_flag:
+                    self.face_detector = self.mesh_detector_vid
                     print(self.face_detector)
                     print(f'Initialized with staticMode set to False for video and realtime detections')
         except Exception as e:
             print(f"Error setting detector option: {e}")
         finally:
             print(f"Reset Settings To:\n Detector: {self.face_detector}\n draw box: {self.draw_box} "
-                  f"\n draw blur: {self.draw_blur} \n staticMode_flag: {staticMode_flag}")
+                  f"\n draw blur: {self.draw_blur} \n staticMode_flag: {self.static_mode_flag}")
+
+    def update_checkbox(self):
+        """
+        Update the draw box and draw blur attributes based on checkbox states.
+
+        Returns:
+            None
+        """
+        self.draw_box = bool(self.bbox_var.get())
+        self.draw_blur = bool(self.blur_var.get())
+        print(f'draw box set to {self.draw_box}')
+        print(f'draw blur set to {self.draw_blur}')

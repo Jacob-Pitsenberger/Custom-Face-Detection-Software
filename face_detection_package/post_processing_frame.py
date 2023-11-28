@@ -80,8 +80,9 @@ class PostProcessDetections(ctk.CTkFrame):
         Returns:
             None
         """
-        print(f"in ... before set we have the detector = {self.face_detector}")
-        self.parent.settings.set_detector(staticMode_flag)
+        print(f"in ... before set we have the detector = {self.face_detector} and the staticMode_flag = {staticMode_flag}")
+        # self.parent.settings.set_detector(staticMode_flag)
+        self.parent.settings.update_detector(staticMode_flag)
         self.face_detector = self.parent.settings.face_detector
         print(f"in create detector, set self.face_detector = {self.face_detector}")
 
