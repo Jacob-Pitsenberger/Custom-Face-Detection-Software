@@ -51,11 +51,11 @@ class FrontalFaceDetector:
         Initialize the FrontalFaceDetector with a pre-trained cascade classifier for face detection.
         """
         # Get the current file directory
-        current_dir = os.path.dirname(os.path.realpath(__file__))
+        # current_dir = os.path.dirname(os.path.realpath(__file__))
 
         # Construct the path to haarcascade file
-        cascade_path = os.path.join(current_dir, 'data-files', 'haarcascade_frontalface_default.xml')
-
+        # cascade_path = os.path.join(current_dir, 'data-files', 'haarcascade_frontalface_default.xml')
+        cascade_path = "C:\\Users\\jakep\\Desktop\\Face Detection Software\\face_detection_package\\data-files\\haarcascade_frontalface_default.xml"
         # Create a cascade
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
