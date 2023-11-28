@@ -1,7 +1,7 @@
 """
 Module: utils.py
 Author: Jacob Pitsenberger
-Date: 11/22/23
+Date: 11/28/23
 
 Description:
     This module provides utility functions for the face detection application. It includes functions for
@@ -21,8 +21,8 @@ from tkinter import filedialog
 import os
 import subprocess
 
-RED = '#4a020d'
-BLUE = '#06003d'
+CUSTOM_RED = '#4a020d'
+CUSTOM_BLUE = '#06003d'
 
 def open_file_explorer() -> str:
     """

@@ -1,7 +1,7 @@
 """
 Module: nav_frame.py
 Author: Jacob Pitsenberger
-Date: 11/22/23
+Date: 11/28/23
 
 Description:
     This module defines the Navigation class, which handles the navigation menu for the face detection application.
@@ -19,25 +19,27 @@ Constants:
 """
 
 import customtkinter as ctk
-from face_detection_package.utils import open_file_with_default_player, RED, BLUE
+from face_detection_package.utils import open_file_with_default_player
 
 class Nav(ctk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.place(x=0, y=0, relwidth=1, relheight=0.2)
-
+        self.parent = parent
+        self.gui_red = self.parent.gui_red
+        self.gui_blue = self.parent.gui_blue
         self.create_widgets()
 
     def create_widgets(self):
         # create the widgets
-        title_frame = ctk.CTkFrame(self, border_width=2, border_color=RED, fg_color=RED)
+        title_frame = ctk.CTkFrame(self, border_width=2, border_color=self.gui_red, fg_color=self.gui_red)
 
         label = ctk.CTkLabel(title_frame, text='FACE DETECTION SOFTWARE', font=('Roboto', 28, 'bold'),
                              text_color='white')
-        files_btn = ctk.CTkButton(title_frame, text='Files', width=75, fg_color=BLUE, font=('Roboto', 12),
+        files_btn = ctk.CTkButton(title_frame, text='Files', width=75, fg_color=self.gui_blue, font=('Roboto', 12),
                                   text_color='white',
                                   command=open_file_with_default_player)
-        help_btn = ctk.CTkButton(title_frame, text='Help', width=75, fg_color=BLUE, font=('Roboto', 12),
+        help_btn = ctk.CTkButton(title_frame, text='Help', width=75, fg_color=self.gui_blue, font=('Roboto', 12),
                                  text_color='white',
                                  command=lambda: self.show_help())
 

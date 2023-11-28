@@ -1,7 +1,7 @@
 """
 Module: frontal_face_detector.py
 Author: Jacob Pitsenberger
-Date: 11/22/23
+Date: 11/28/23
 
 Description:
     This module provides a FrontalFaceDetector class that handles face detection using the OpenCV library.
@@ -75,7 +75,8 @@ class FrontalFaceDetector:
             # Convert the frame to grayscale
             frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            faces = self.face_cascade.detectMultiScale(image=frame_gray, scaleFactor=1.05, minNeighbors=5)
+            # Changing scaleFactor value to 1.2 as to speed up detection time for post-processing video files (was 1.05 causing this issue).
+            faces = self.face_cascade.detectMultiScale(image=frame_gray, scaleFactor=1.2, minNeighbors=5)
 
             # For the x, y coordinates and width, height detected
             for (x, y, w, h) in faces:

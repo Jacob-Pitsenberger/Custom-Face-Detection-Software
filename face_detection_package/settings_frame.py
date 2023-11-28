@@ -1,7 +1,7 @@
 """
 Module: settings_frame.py
 Author: Jacob Pitsenberger
-Date: 11/22/23
+Date: 11/28/23
 
 Description:
     This module defines the Settings class, responsible for creating a graphical user interface (GUI) to adjust
@@ -25,7 +25,7 @@ Constants:
 import customtkinter as ctk
 from face_detection_package.frontal_face_detector import FrontalFaceDetector
 from face_detection_package.mesh_face_detector import FaceMeshDetector
-from face_detection_package.utils import RED, BLUE
+
 
 class Settings(ctk.CTkFrame):
     def __init__(self, parent):
@@ -41,34 +41,38 @@ class Settings(ctk.CTkFrame):
         super().__init__(parent)
         self.place(x=0, rely=0.2, relwidth=0.6, relheight=0.8)
 
+        self.parent = parent
+        self.gui_red = self.parent.gui_red
+        self.gui_blue = self.parent.gui_blue
+
         # create the widgets
-        self.settings_frame = ctk.CTkFrame(self, border_width=2, border_color=RED)
+        self.settings_frame = ctk.CTkFrame(self, border_width=2, border_color=self.gui_red)
 
         self.settings_label = ctk.CTkLabel(self.settings_frame, text='Settings', font=('Roboto', 20, 'bold'),
-                                           bg_color=RED, text_color='white')
+                                           bg_color=self.gui_red, text_color='white')
 
-        self.detector_label = ctk.CTkLabel(self.settings_frame, text='Detector:', font=('Roboto', 14), text_color='white')
+        self.detector_label = ctk.CTkLabel(self.settings_frame, text='Detector:', font=('Roboto', 14),
+                                           text_color='white')
 
         self.detector_options = ['Basic: Frontal Face Detector', 'Advanced: Mesh Face Detector']
         self.detector_menu_var = ctk.StringVar(value=self.detector_options[0])
 
         self.detector_menu = ctk.CTkOptionMenu(self.settings_frame, values=self.detector_options,
                                                variable=self.detector_menu_var,
-                                               fg_color=BLUE, font=('Roboto', 12), text_color='white')
+                                               fg_color=self.gui_blue, font=('Roboto', 12), text_color='white')
 
         self.effects_label = ctk.CTkLabel(self.settings_frame, text='Effects:', font=('Roboto', 14), text_color='white')
 
-        self.bbox_cb = ctk.CTkCheckBox(self.settings_frame, text='Show Detection Bounding Box', fg_color=BLUE,
-                                       font=('Roboto', 12), text_color='white', border_color=BLUE)
+        self.bbox_cb = ctk.CTkCheckBox(self.settings_frame, text='Show Detection Bounding Box', fg_color=self.gui_blue,
+                                       font=('Roboto', 12), text_color='white', border_color=self.gui_blue)
         self.bbox_cb.select()
 
-        self.blur_cb = ctk.CTkCheckBox(self.settings_frame, text='Blur Detections', fg_color=BLUE, font=('Roboto', 12),
-                                       text_color='white', border_color=BLUE)
+        self.blur_cb = ctk.CTkCheckBox(self.settings_frame, text='Blur Detections', fg_color=self.gui_blue,
+                                       font=('Roboto', 12),
+                                       text_color='white', border_color=self.gui_blue)
         # create the grid
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
-
-        self.parent = parent
 
         # Set the default effect and face detector settings.
         self.draw_box = True
@@ -163,5 +167,3 @@ class Settings(ctk.CTkFrame):
         finally:
             print(f"Reset Settings To:\n Detector: {self.face_detector}\n draw box: {self.draw_box} "
                   f"\n draw blur: {self.draw_blur} \n staticMode_flag: {staticMode_flag}")
-
-

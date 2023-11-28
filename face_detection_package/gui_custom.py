@@ -1,7 +1,7 @@
 """
 Module: gui_custom.py
 Author: Jacob Pitsenberger
-Date: 11/22/23
+Date: 11/28/23
 
 Description:
     This module defines the Application class, which serves as the main entry point for the face detection
@@ -28,6 +28,8 @@ from face_detection_package.nav_frame import Nav
 from face_detection_package.settings_frame import Settings
 from face_detection_package.post_processing_frame import PostProcessDetections
 from face_detection_package.directory_manager import DirectoryManager
+from face_detection_package.utils import CUSTOM_RED, CUSTOM_BLUE
+
 
 class App(ctk.CTk):
     def __init__(self):
@@ -51,6 +53,10 @@ class App(ctk.CTk):
         self.title('FACE DETECTION SOFTWARE')
         self.geometry(f'{size[0]}x{size[1]}')
         self.minsize(size[0], size[1])
+
+        # Define custom colors
+        self.gui_red = CUSTOM_RED
+        self.gui_blue = CUSTOM_BLUE
 
         # Create widgets
         self.nav = Nav(self)

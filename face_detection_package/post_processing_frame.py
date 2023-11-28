@@ -1,7 +1,7 @@
 """
 Module: post_processing_frame.py
 Author: Jacob Pitsenberger
-Date: 11/22/23
+Date: 11/28/23
 
 Description:
     This module defines the PostProcessDetections class, which is responsible for creating a graphical user
@@ -24,7 +24,7 @@ Constants:
 """
 
 import os
-from face_detection_package.utils import open_file_explorer, RED, BLUE
+from face_detection_package.utils import open_file_explorer
 import customtkinter as ctk
 import datetime
 import cv2
@@ -44,22 +44,26 @@ class PostProcessDetections(ctk.CTkFrame):
         super().__init__(parent)
         self.place(relx=0.6, rely=0.2, relwidth=0.4, relheight=0.8)
 
-        self.detections_frame = ctk.CTkFrame(self, border_width=2, border_color=RED)
+        self.parent = parent
+
+        self.gui_red = self.parent.gui_red
+        self.gui_blue = self.parent.gui_blue
+
+        self.detections_frame = ctk.CTkFrame(self, border_width=2, border_color=self.gui_red)
         self.detections_label = ctk.CTkLabel(self.detections_frame, text='Make Detections', font=('Roboto', 20, 'bold'),
-                                             bg_color=RED, text_color='white')
-        self.video_btn = ctk.CTkButton(self.detections_frame, text='Process Video', fg_color=BLUE, font=('Roboto', 12),
+                                             bg_color=self.gui_red, text_color='white')
+        self.video_btn = ctk.CTkButton(self.detections_frame, text='Process Video', fg_color=self.gui_blue, font=('Roboto', 12),
                                        text_color='white', command=self.detect_over_video)
-        self.image_btn = ctk.CTkButton(self.detections_frame, text='Process Image', fg_color=BLUE, font=('Roboto', 12),
+        self.image_btn = ctk.CTkButton(self.detections_frame, text='Process Image', fg_color=self.gui_blue, font=('Roboto', 12),
                                        text_color='white', command=self.detect_over_image)
         self.status_lbl = ctk.CTkLabel(self.detections_frame, text='', font=('Roboto', 16, 'bold'), text_color='white')
 
-        self.bottom_border_lbl = ctk.CTkLabel(self.detections_frame, text='', bg_color=RED, text_color='white')
+        self.bottom_border_lbl = ctk.CTkLabel(self.detections_frame, text='', bg_color=self.gui_red, text_color='white')
 
         # create the grid
         self.columnconfigure(0, weight=1, uniform='a')
         self.rowconfigure(0, weight=1, uniform='a')
 
-        self.parent = parent
         self.face_detector = None
         print(self.face_detector)
         self.directory_manager = self.parent.directory_manager
