@@ -32,7 +32,6 @@ import cv2
 import os
 import numpy as np
 
-
 class FrontalFaceDetector:
     """
     Provides a FrontalFaceDetector class that handles face detection using the OpenCV library.
@@ -50,12 +49,12 @@ class FrontalFaceDetector:
         """
         Initialize the FrontalFaceDetector with a pre-trained cascade classifier for face detection.
         """
-        # Get the current file directory
-        # current_dir = os.path.dirname(os.path.realpath(__file__))
+        # This works for the executable in the fdsw basic folder that access the xml through the package.
+        # cascade_path = 'face_detection_package/data-files/haarcascade_frontalface_default.xml'
 
-        # Construct the path to haarcascade file
-        # cascade_path = os.path.join(current_dir, 'data-files', 'haarcascade_frontalface_default.xml')
-        cascade_path = "C:\\Users\\jakep\\Desktop\\Face Detection Software\\face_detection_package\\data-files\\haarcascade_frontalface_default.xml"
+        # This is for simply putting a copy of the xml in a folder with the .exe and zipping it to download.
+        cascade_path = 'haarcascade_frontalface_default.xml'
+
         # Create a cascade
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
 
@@ -108,6 +107,4 @@ class FrontalFaceDetector:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), self.BOX_COLOR, self.BOX_THICKNESS)
         except Exception as e:
             print(f"Error in draw rectangle: {e}")
-
-
 
