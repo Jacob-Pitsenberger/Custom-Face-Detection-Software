@@ -1,7 +1,7 @@
 """
 Module: frontal_face_detector.py
 Author: Jacob Pitsenberger
-Date: 11/28/23
+Date: 12/19/23
 
 Description:
     This module provides a FrontalFaceDetector class that handles face detection using the OpenCV library.
@@ -29,7 +29,6 @@ Attributes:
 - draw_blur: Flag indicating whether to blur detected faces.
 """
 import cv2
-import os
 import numpy as np
 
 class FrontalFaceDetector:
@@ -43,17 +42,16 @@ class FrontalFaceDetector:
     TEXT_THICKNESS = 1
     SCALE = 1
 
-    # def __init__(self, draw_box, draw_blur):
     def __init__(self, settings):
 
         """
         Initialize the FrontalFaceDetector with a pre-trained cascade classifier for face detection.
         """
         # This works for the executable in the fdsw basic folder that access the xml through the package.
-        # cascade_path = 'face_detection_package/data-files/haarcascade_frontalface_default.xml'
+        cascade_path = 'face_detection_package/data-files/haarcascade_frontalface_default.xml'
 
         # This is for simply putting a copy of the xml in a folder with the .exe and zipping it to download.
-        cascade_path = 'haarcascade_frontalface_default.xml'
+        # cascade_path = 'haarcascade_frontalface_default.xml'
 
         # Create a cascade
         self.face_cascade = cv2.CascadeClassifier(cascade_path)
@@ -61,15 +59,12 @@ class FrontalFaceDetector:
         self.version_name = "Basic: Frontal Face Detector"
         self.settings = settings
 
-        # self.draw_box = draw_box
-        # self.draw_blur = draw_blur
-
     def detect_faces(self, frame: np.ndarray) -> None:
         """
         Detect faces in a given frame using the pre-trained cascade classifier.
 
         Args:
-            frame: The input frame in which faces will be detected.
+            frame (np.ndarray): The input frame in which faces will be detected.
 
         Returns:
             None
@@ -89,7 +84,7 @@ class FrontalFaceDetector:
         except Exception as e:
             print(f"Error in detect faces: {e}")
 
-    def draw_rectangle(self, frame, dims):
+    def draw_rectangle(self, frame: np.ndarray, dims: list):
         try:
             x, y, w, h = dims
             # if self.draw_blur is True:

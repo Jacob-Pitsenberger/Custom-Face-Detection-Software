@@ -1,7 +1,7 @@
 """
-Module: gui_custom.py
+Module: gui.py
 Author: Jacob Pitsenberger
-Date: 11/28/23
+Date: 12/19/23
 
 Description:
     This module defines the Application class, which serves as the main entry point for the face detection
@@ -13,9 +13,10 @@ Classes:
 
 Dependencies:
 - customtkinter as ctk: A customized version of the tkinter library for GUI development.
-- Navigation: Module containing the Navigation class.
-- PostProcessDetections: Module containing the PostProcessDetections class.
-- Settings: Module containing the Settings class.
+- face_detection_package.nav_frame: Module containing the Navigation class.
+- face_detection_package.realtime_processing_frame: Module containing the ProcessRealtimeDetections class.
+- face_detection_package.post_processing_frame: Module containing the PostProcessDetections class
+- face_detection_package.setting_frame: Module containing the Settings class.
 - face_detection_package.directory_manager: Module containing the DirectoryManager class for managing directories.
 
 Constants:
@@ -24,18 +25,15 @@ Constants:
 """
 
 import customtkinter as ctk
-# from face_detection_package.nav_frame import Nav
-from face_detection_package.basic_nav_frame import BasicNav
-# from face_detection_package.settings_frame import Settings
-from face_detection_package.basic_only_settings import BasicDetectorSettings
-# from face_detection_package.post_processing_frame import PostProcessDetections
-from face_detection_package.basic_only_post_processing_frame import BasicPostProcessDetections
 from face_detection_package.directory_manager import DirectoryManager
+from face_detection_package.nav_frame import Nav
+from face_detection_package.post_processing_frame import PostProcessDetections
+from face_detection_package.realtime_processing_frame import ProcessRealtimeDetections
+from face_detection_package.setting_frame import DetectorSettings
 from face_detection_package.utils import CUSTOM_RED, CUSTOM_BLUE
 
-
 class App(ctk.CTk):
-    def __init__(self):
+    def __init__(self, version):
         """
         Initialize the main application.
 
@@ -48,8 +46,9 @@ class App(ctk.CTk):
         # main setup
         super().__init__()
 
+        self.version = version
         # Create and configure the directory manager
-        self.directory_manager = DirectoryManager()
+        self.directory_manager = DirectoryManager(self.version)
         self.directory_manager.create_directories()
 
         size = (600, 370)
@@ -63,13 +62,14 @@ class App(ctk.CTk):
         self.gui_blue = CUSTOM_BLUE
 
         # Create widgets
-        # self.nav = Nav(self)
-        self.nav = BasicNav(self)
+        self.nav = Nav(self)
 
-        # self.settings = Settings(self)
-        self.settings = BasicDetectorSettings(self)
-        # self.detections = PostProcessDetections(self)
-        self.detections = BasicPostProcessDetections(self)
+        self.settings = DetectorSettings(self)
+
+        if self.version == 'pp':
+            self.detections = PostProcessDetections(self)
+        elif self.version == 'rf':
+            self.detections = ProcessRealtimeDetections(self)
 
         # Run the application
         self.mainloop()

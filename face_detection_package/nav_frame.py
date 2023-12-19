@@ -1,14 +1,14 @@
 """
 Module: nav_frame.py
 Author: Jacob Pitsenberger
-Date: 11/28/23
+Date: 12/19/23
 
 Description:
     This module defines the Navigation class, which handles the navigation menu for the face detection application.
     It includes options to navigate between different sections of the application, such as post-processing and settings.
 
 Classes:
-- Navigation: A class representing the navigation menu for the face detection application.
+- Nav: A class representing the navigation menu for the face detection application.
 
 Dependencies:
 - customtkinter as ctk: A customized version of the tkinter library for GUI development.
@@ -20,6 +20,7 @@ Constants:
 
 import customtkinter as ctk
 from face_detection_package.utils import open_file_with_default_player
+
 
 class Nav(ctk.CTkFrame):
     def __init__(self, parent):
@@ -34,7 +35,7 @@ class Nav(ctk.CTkFrame):
         # create the widgets
         title_frame = ctk.CTkFrame(self, border_width=2, border_color=self.gui_red, fg_color=self.gui_red)
 
-        label = ctk.CTkLabel(title_frame, text='FACE DETECTION SOFTWARE', font=('Roboto', 28, 'bold'),
+        label = ctk.CTkLabel(title_frame, text='FACE DETECTION SOFTWARE - BASIC', font=('Roboto', 20, 'bold'),
                              text_color='white')
         files_btn = ctk.CTkButton(title_frame, text='Files', width=75, fg_color=self.gui_blue, font=('Roboto', 12),
                                   text_color='white',
@@ -61,7 +62,7 @@ class Nav(ctk.CTkFrame):
         try:
             help_text = """
                 Welcome to the Face Detection Software!
-                
+
                 Instructions:
                 1. Specify the detector version by selecting it from the drop-down menu in the settings frame.
                 2. Check the boxes in the settings frame for the effects you want applied to detections.
@@ -69,11 +70,11 @@ class Nav(ctk.CTkFrame):
                 4. In the post-processing frame, press the 'Image' button to open the file explorer and select an image file for detections.
                 5. After selecting either post-processing button, text will appear on the interface indicating that the selected file is 
                    being processed for detections. When detections are done processing, this message will update indicating success.
-                
+
                 Buttons:
                 - Files Button: Click this button to open the file explorer and select a file to view.
                 - Help Button: Click this button to view instructions on how to use the program.
-                
+
                 Notes:
                 - Ensure you use video/image files with valid extensions (.mp4, .mov, .jpg, .png) when making detections.
                 - Image and video detections are saved to the 'image_detections' and 'video_detections' directories, respectively.
@@ -81,7 +82,7 @@ class Nav(ctk.CTkFrame):
                   (Note: The GUI will appear unresponsive until the success message appears.)
                 - The detector is initialized when either the 'Video' or Image' detection button is pressed and is 
                   done so with the current values specified in the settings frame.
-                
+
                 Enjoy using the Face Detection Software!
                 """
             help_window = ctk.CTk()

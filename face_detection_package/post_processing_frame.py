@@ -1,7 +1,7 @@
 """
 Module: post_processing_frame.py
 Author: Jacob Pitsenberger
-Date: 11/28/23
+Date: 12-19-23
 
 Description:
     This module defines the PostProcessDetections class, which is responsible for creating a graphical user
@@ -81,9 +81,8 @@ class PostProcessDetections(ctk.CTkFrame):
             None
         """
         print(f"in ... before set we have the detector = {self.face_detector} and the staticMode_flag = {staticMode_flag}")
-        # self.parent.settings.set_detector(staticMode_flag)
-        self.parent.settings.update_detector(staticMode_flag)
-        self.face_detector = self.parent.settings.face_detector
+        # Changed to set the detector directly to the haar_detector
+        self.face_detector = self.parent.settings.haar_detector
         print(f"in create detector, set self.face_detector = {self.face_detector}")
 
     def create_widgets(self) -> None:
@@ -119,6 +118,7 @@ class PostProcessDetections(ctk.CTkFrame):
         Raises:
             ValueError: If the selected video file has an invalid extension.
             cv2.error: If an OpenCV-related error occurs during video processing.
+            Exception: For other generic exceptions.
 
         Returns:
             None
@@ -163,11 +163,11 @@ class PostProcessDetections(ctk.CTkFrame):
                 self.status_lbl.configure(text="Video detections processed")
                 self.after(5000, self.clear_status_label)
         except ValueError as ve:
-            print(f"ValueError: {ve}")
+            print(f"ValueError in detect_over_video: {ve}")
         except cv2.error as cve:
-            print(f"OpenCV Error: {cve}")
+            print(f"OpenCV Error in detect_over_video: {cve}")
         except Exception as e:
-            print(f"Error detecting faces over video: {e}")
+            print(f"Error in detect_over_video: {e}")
 
     def detect_over_image(self) -> None:
         """
@@ -175,6 +175,7 @@ class PostProcessDetections(ctk.CTkFrame):
 
         Raises:
             ValueError: If the selected image file has an invalid extension.
+            Exception: For other generic exceptions.
 
         Returns:
             None
@@ -206,6 +207,6 @@ class PostProcessDetections(ctk.CTkFrame):
                 self.status_lbl.configure(text="Image detections processed")
                 self.after(5000, self.clear_status_label)
         except ValueError as ve:
-            print(f"ValueError: {ve}")
+            print(f"ValueError in detect_over_image: {ve}")
         except Exception as e:
-            print(f"Error detecting faces over image: {e}")
+            print(f"Error in detect_over_image: {e}")
